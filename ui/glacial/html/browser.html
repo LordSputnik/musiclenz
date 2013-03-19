@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>Test Title</title>
+
+        <meta charset="UTF-8"/>
+
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="../css/browser.css"/>
+
+         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+         <script src="../js/browser.js"></script>
+    </head>
+
+    <body>
+        <div id="content">
+            <header>
+                <div id="play" onclick="toggle_play()">Play</div>
+                <div id="stop" onclick="stop_event()">Stop</div>
+                <div id="quit" onclick="printer.quit()">Quit</div>
+                <div id="volume"></div>
+                <div id="nowplaying"></div>
+                <div id="duration_holder"><span id="time"></span>/<span id="duration"></span></div>
+            </header>
+
+            <div id="left-pane">
+                blahblah
+                <div id="song-list"></div>
+                <div id="track_slider"></div>
+            </div>
+            <div id="right-pane">
+                b
+            </div>
+        </div>
+        <div id="song" style="clear:left;"></div>
+        <span id="time"></span>/<span id="duration"></span>
+    </body>
+</html>
