@@ -13,23 +13,34 @@ import json
 import mutagen
 import datetime
 
-libraryFolder = "/home/ben/Music/FLAC/CDs"
+import sqlite3 as db
+
+import musiclenz.library
+
+libraryFolder = "/media/Core/Users/Ben/Music/pod"
 files = list()
 song_names = dict()
 song_keys = list()
+artist_list = list()
 
 def GetFileList():
     num_files = 0
     for directory,directories,filenames in os.walk(libraryFolder):
         for filename in filenames:
-            if os.path.splitext(filename)[1] == ".flac" or os.path.splitext(filename)[1] == ".ogg":
+            if os.path.splitext(filename)[1] == ".flac" or os.path.splitext(filename)[1] == ".ogg" or os.path.splitext(filename)[1] == ".mp3":
                 filename = os.path.join(directory,filename)
                 audio = mutagen.File(filename,easy=True)
                 song_names[audio["title"][0]] = filename
+                if not audio["artist"][0] in artist_list:
+                    print audio["artist"][0]
+                    artist_list.append(audio["artist"][0])
+
                 num_files += 1
 
                 if num_files > 500:
                     return
+
+    artist_list.sort()
 
 class MediaController(QtCore.QObject):
 
@@ -84,7 +95,6 @@ class MediaController(QtCore.QObject):
     time = QtCore.Property(str, fget=_time)
 
 
-    @QtCore.Slot()
     def getTracks(self):
         global song_names,song_keys
 
@@ -94,6 +104,13 @@ class MediaController(QtCore.QObject):
         return json.dumps(song_keys)
 
     tracks = QtCore.Property(str, fget=getTracks)
+
+    def getArtists(self):
+        global artist_list
+
+        return json.dumps(artist_list)
+
+    artists = QtCore.Property(str, fget=getArtists)
 
     @QtCore.Slot()
     def stop(self):
@@ -129,7 +146,24 @@ class MediaController(QtCore.QObject):
         print message
 
 
+local_db = db.connect("test.db")
+local_db.row_factory = db.Row
+cur = local_db.cursor()
+result = cur.execute("SELECT title FROM songs")
+rows = result.fetchall()
+cur.close()
+
+lib = musiclenz.library.Library(1,local_db)
+lib.Scan()
+
+for song in lib.songs:
+    print song
+
+raw_input()
+
 app = QtGui.QApplication(sys.argv)
+
+
 
 controller = MediaController()
 

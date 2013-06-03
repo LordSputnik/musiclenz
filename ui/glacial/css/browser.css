@@ -1,12 +1,13 @@
 html, body { margin: 0; padding: 0; overflow: auto; width: 100%; height: 100%; font-family:"Trebuchet MS", Helvetica, sans-serif; }
 
-#content { width: 900px; margin: 100px auto 0 auto; }
+#content { width: 100%; margin: 100px auto 0 auto; }
 
-#left-pane { margin: 0 auto 2em auto; width: 30%; float: left; }
+#left-pane { margin: 0 auto 2em auto; width: 29%; float: left; }
 
-#right-pane { margin: 0 auto 2em auto; width: 70%; float: right; }
+#right-pane { margin: 0 auto 2em auto; width: 69%; float: right; }
 
 header { margin: 0 auto 2em auto; width: 100%; height:10em; clear: both; text-align:center; position: relative; }
+div { border: solid 1px }
 
 #play { width:18%; position:absolute; left:0px; top:0px; }
 
@@ -19,4 +20,8 @@ header { margin: 0 auto 2em auto; width: 100%; height:10em; clear: both; text-al
 #nowplaying { text-align:left; width:30%; position:absolute; left:0px; top:2em; }
 #duration_holder { text-align:left; width:30%; position:absolute; left:40%; top:2em; }
 
-#song-list { width:80%; white-space:nowrap; overflow:hidden; }
+#artist-names { width:80%; white-space:nowrap; overflow:hidden; float:left; }
+
+#song-list { width:90%; white-space:nowrap; overflow:hidden; float:left; }
+#song-names { width:30%; white-space:nowrap; overflow:hidden; float:left; }
+#track_slider { height: 200px; float:right; }

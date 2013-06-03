@@ -12,8 +12,18 @@ function play_song() {
 
 var prev_interval;
 
+var current_song;
+
 function play_event(song) {
     printer.play(song);
+
+    if(current_song !== undefined)
+    {
+        $("#song_"+current_song).css("background-color","rgb(255,255,255)");
+    }
+
+    current_song = song;
+    $("#song_"+song).css("background-color","rgb(0,100,255)");
 
     $("#duration").text(printer.duration);
 
@@ -48,7 +58,7 @@ function parse_songlist(songs) {
     /*for (i = 0; i < songs.length; i++) {
         document.getElementById("song_list").innerHTML += "<div onclick='printer.play("+i+")'>" + songs[i] + "</div>";
     }*/
-    document.getElementById("song-list").innerHTML = "blob";
+    document.getElementById("song-names").innerHTML = "blob";
 }
 
 $(document).ready(function() {
@@ -60,9 +70,30 @@ $(document).ready(function() {
     });
 
     var i, track_object = jQuery.parseJSON(printer.tracks);
-    document.getElementById("song-list").innerHTML = "";
-    for (i = 0; i < track_object.length; i++) {
+    document.getElementById("song-names").innerHTML = "";
+    for (i = 0; i < 10; i++) {
         //alert("<div onclick='play_event("+i+")'>" + track_object[i] + "</div>");
-        document.getElementById("song-list").innerHTML += "<div onclick='play_event("+i+")'>" + track_object[i] + "</div>";
+        document.getElementById("song-names").innerHTML += "<div id='song_"+i+"' onclick='play_event("+i+")'>" + track_object[i] + "</div>";
+    }
+
+    $( "#track_slider" ).slider({
+        slide: function( event, ui ) {
+            var i, track_object = jQuery.parseJSON(printer.tracks);
+            document.getElementById("song-names").innerHTML = "";
+            for (i = 0; i < 10; i++) {
+                //alert("<div onclick='play_event("+i+")'>" + track_object[i] + "</div>");
+                document.getElementById("song-names").innerHTML += "<div id='song_"+(i+track_object.length-ui.value)+"' onclick='play_event("+(i+track_object.length-ui.value)+")'>" + track_object[i+track_object.length-ui.value] + "</div>";
+            }
+        },
+        orientation: "vertical",
+        min: 10,
+        max: track_object.length,
+        value: track_object.length
+    });
+
+    var i, artist_object = jQuery.parseJSON(printer.artists);
+    document.getElementById("artist-names").innerHTML = "";
+    for (i = 0; i < 20; i++) {
+        document.getElementById("artist-names").innerHTML += "<div onclick='play_event("+i+")'>" + artist_object[i] + "</div>";
     }
 });
