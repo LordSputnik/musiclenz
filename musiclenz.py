@@ -7,7 +7,7 @@ import PySide.QtWebKit as WebKit
 
 import gobject
 gobject.threads_init()
-import gst
+
 import os
 import json
 import mutagen
@@ -16,6 +16,8 @@ import datetime
 import sqlite3 as db
 
 import musiclenz.library
+import musiclenz.ui
+import musiclenz.player
 
 libraryFolder = "/media/Core/Users/Ben/Music/pod"
 files = list()
@@ -25,11 +27,11 @@ artist_list = list()
 
 def GetFileList():
     num_files = 0
-    for directory,directories,filenames in os.walk(libraryFolder):
+    for directory, directories, filenames in os.walk(libraryFolder):
         for filename in filenames:
             if os.path.splitext(filename)[1] == ".flac" or os.path.splitext(filename)[1] == ".ogg" or os.path.splitext(filename)[1] == ".mp3":
-                filename = os.path.join(directory,filename)
-                audio = mutagen.File(filename,easy=True)
+                filename = os.path.join(directory, filename)
+                audio = mutagen.File(filename, easy = True)
                 song_names[audio["title"][0]] = filename
                 if not audio["artist"][0] in artist_list:
                     print audio["artist"][0]
@@ -51,66 +53,66 @@ class MediaController(QtCore.QObject):
         if self.playing:
             self.sound_req.emit()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent = None):
         super(MediaController, self).__init__(parent)
         self.playing = False
         self.test_string = "Tits."
         self.sound_req.connect(self.sound_req_handler)
-        self.player = gst.element_factory_make("playbin2","player")
+        self.player = gst.element_factory_make("playbin2", "player")
         fakesink = gst.element_factory_make("fakesink", "fakesink")
         self.player.set_property("video-sink", fakesink)
         self.cur_time = 0
         self.player.set_property("volume", 1.0)
 
     @QtCore.Slot(int)
-    def play(self,song):
+    def play(self, song):
         global app, view
         self.playing = True
         self.cur_time = 0
 
         self.player.set_state(gst.STATE_NULL)
-        self.player.set_property("uri", "file://"+song_names[song_keys[song]])
+        self.player.set_property("uri", "file://" + song_names[song_keys[song]])
         self.player.set_state(gst.STATE_PLAYING)
 
-        #print self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_KEY_UNIT, 10000000000)
+        # print self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_KEY_UNIT, 10000000000)
 
-        view.page().mainFrame().evaluateJavaScript("update(\""+song_keys[song]+"\"); null")
-        #while(self.playing):
-            #print "Request!"
-            #app.processEvents()
+        view.page().mainFrame().evaluateJavaScript("update(\"" + song_keys[song] + "\"); null")
+        # while(self.playing):
+            # print "Request!"
+            # app.processEvents()
 
     def _duration(self):
         self.player.get_state()
         duration = self.player.query_duration(gst.FORMAT_TIME)[0]
-        delta = datetime.timedelta(seconds=(duration / gst.SECOND))
+        delta = datetime.timedelta(seconds = (duration / gst.SECOND))
         return str(delta)
 
-    duration = QtCore.Property(str, fget=_duration)
+    duration = QtCore.Property(str, fget = _duration)
 
     def _time(self):
         self.cur_time += 1
-        delta = datetime.timedelta(seconds=self.cur_time)
+        delta = datetime.timedelta(seconds = self.cur_time)
         return str(delta)
 
-    time = QtCore.Property(str, fget=_time)
+    time = QtCore.Property(str, fget = _time)
 
 
     def getTracks(self):
-        global song_names,song_keys
+        global song_names, song_keys
 
         song_keys = song_names.keys()
         song_keys.sort()
 
         return json.dumps(song_keys)
 
-    tracks = QtCore.Property(str, fget=getTracks)
+    tracks = QtCore.Property(str, fget = getTracks)
 
     def getArtists(self):
         global artist_list
 
         return json.dumps(artist_list)
 
-    artists = QtCore.Property(str, fget=getArtists)
+    artists = QtCore.Property(str, fget = getArtists)
 
     @QtCore.Slot()
     def stop(self):
@@ -129,17 +131,13 @@ class MediaController(QtCore.QObject):
     def _playing(self):
         return self.playing
 
-    is_playing = QtCore.Property(bool, fget=_playing)
+    is_playing = QtCore.Property(bool, fget = _playing)
 
     @QtCore.Slot()
     def quit(self):
         global app
         self.player.set_state(gst.STATE_NULL)
         app.quit()
-
-    @QtCore.Slot(int)
-    def setVolume(self, value):
-        self.player.set_property("volume", pow(float(value)/100.0,2.0))
 
     @QtCore.Slot(str)
     def print_msg(self, message):
@@ -148,34 +146,23 @@ class MediaController(QtCore.QObject):
 
 local_db = db.connect("test.db")
 local_db.row_factory = db.Row
-cur = local_db.cursor()
-result = cur.execute("SELECT title FROM songs")
-rows = result.fetchall()
-cur.close()
 
-lib = musiclenz.library.Library(1,local_db)
-lib.Scan()
 
-for song in lib.songs:
-    print song
+lib = musiclenz.library.Library(1, local_db)
+# lib.rescan()
 
-raw_input()
 
 app = QtGui.QApplication(sys.argv)
 
-
-
-controller = MediaController()
-
 view = WebKit.QWebView()
-GetFileList()
-view.setFixedSize(1024,768)
+# GetFileList()
+view.setFixedSize(1024, 768)
 view.load("./ui/glacial/html/browser.html")
-view.page().mainFrame().addToJavaScriptWindowObject('printer',controller)
+ui_control = musiclenz.ui.UIController(view)
+player = musiclenz.player.Player()
 view.show()
 
-#print "parse_songlist("+json.dumps(files)+"); null"
-#view.page().mainFrame().evaluateJavaScript("parse_songlist(['test']); null")
+print "Done!"
 
 app.exec_()
 sys.exit()

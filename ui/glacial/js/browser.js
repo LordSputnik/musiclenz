@@ -62,23 +62,23 @@ function parse_songlist(songs) {
 }
 
 $(document).ready(function() {
-    $( "#volume" ).slider({
+/*    $( "#volume" ).slider({
         slide: function( event, ui ) {
             printer.setVolume(ui.value);
         },
         value: 100
-    });
+    });*/
 
-    var i, track_object = jQuery.parseJSON(printer.tracks);
+/*    var i, track_object = jQuery.parseJSON(printer.tracks);
     document.getElementById("song-names").innerHTML = "";
     for (i = 0; i < 10; i++) {
         //alert("<div onclick='play_event("+i+")'>" + track_object[i] + "</div>");
         document.getElementById("song-names").innerHTML += "<div id='song_"+i+"' onclick='play_event("+i+")'>" + track_object[i] + "</div>";
-    }
+    }*/
 
-    $( "#track_slider" ).slider({
+/*    $( "#track_slider" ).slider({
         slide: function( event, ui ) {
-            var i, track_object = jQuery.parseJSON(printer.tracks);
+            var i, track_object = jQuery.parseJSON(main_window.tracks);
             document.getElementById("song-names").innerHTML = "";
             for (i = 0; i < 10; i++) {
                 //alert("<div onclick='play_event("+i+")'>" + track_object[i] + "</div>");
@@ -89,11 +89,12 @@ $(document).ready(function() {
         min: 10,
         max: track_object.length,
         value: track_object.length
-    });
+    });*/
 
-    var i, artist_object = jQuery.parseJSON(printer.artists);
+    var i, artist_object = jQuery.parseJSON(main_window.artists);
     document.getElementById("artist-names").innerHTML = "";
+    var element = document.getElementById("artist-names");
     for (i = 0; i < 20; i++) {
-        document.getElementById("artist-names").innerHTML += "<div onclick='play_event("+i+")'>" + artist_object[i] + "</div>";
+        element.innerHTML += "<div onclick='play_event("+i+")'>" + artist_object[i][1] + "</div>";
     }
 });

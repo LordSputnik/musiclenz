@@ -6,13 +6,13 @@ class Library:
 
         cur = db_con.cursor()
 
-        cur.execute("SELECT name, directory FROM libraries WHERE id=?",(lib_id,))
+        cur.execute("SELECT name, directory FROM libraries WHERE id=?", (lib_id,))
         row = cur.fetchone()
 
         self.directory = row["directory"]
         self.name = row["name"]
 
-        cur.execute("SELECT title FROM songs WHERE library=?",(lib_id,))
+        cur.execute("SELECT id, title, artist FROM songs WHERE library=?", (lib_id,))
         rows = cur.fetchall()
 
         self.songs = list()
@@ -22,10 +22,13 @@ class Library:
             for key in row.keys():
                 self.songs[-1][key] = row[key]
 
-    def Scan(self):
+    def rescan(self):
         print self.name, repr(self.directory)
         for directory, directories, filenames in os.walk(self.directory):
             for filename in filenames:
+                import mutagen
+
+
                 ext = os.path.splitext(filename)[1]
                 print ext
         return
